@@ -18,13 +18,18 @@ interface TodoType {
 const AddProduct = () => {
   const [todos, setTodos] = useState<TodoType[]>([]);
   const [isEditId, setIsEditId] = useState<null | number>(null);
-  const { register: registerAdd, handleSubmit: handleSubmitAdd } =
-    useForm<TodoType>();
+
+  const {
+    register: registerAdd,
+    handleSubmit: handleSubmitAdd,
+    reset: resetAdd,
+  } = useForm<TodoType>();
 
   const {
     register: registerEdit,
     handleSubmit: handleSubmitEdit,
     setValue,
+    reset: resetEdit,
   } = useForm<TodoType>();
 
   const onSubmitAdd: SubmitHandler<TodoType> = async (data) => {
@@ -45,6 +50,7 @@ const AddProduct = () => {
 
     const { data: responseTodos } = await axios.post(BACKEND_URL, newData);
     setTodos(responseTodos);
+    resetAdd();
   };
 
   const handleComplete = async (_id: number, isCompleted: boolean) => {
@@ -88,6 +94,7 @@ const AddProduct = () => {
     );
     setTodos(responseTodos);
     setIsEditId(null);
+    resetEdit();
   };
 
   useEffect(() => {
@@ -139,11 +146,16 @@ const AddProduct = () => {
               <>
                 <h1>{item.title}</h1>
                 <img src={item.img} alt={item.title} />
-
+                <button
+                  onClick={() => handleComplete(item._id!, item.isCompleted)}
+                >
+                  {item.isCompleted ? "@_@" : "Завершить"}
+                </button>
                 <button
                   onClick={() => {
                     setIsEditId(item._id!);
                     setValue("title", item.title);
+                    setValue("img", item.img);
                   }}
                 >
                   Изменить
